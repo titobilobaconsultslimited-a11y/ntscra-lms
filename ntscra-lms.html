@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NTSCRA - Exam Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ntscra-lms.css">
+</head>
+<body>
+<div class="bg-pattern"></div>
+<div class="bg-lines"></div>
+
+<!-- ADMIN LOGIN GATE -->
+<div id="admin-login-page" style="display:none; position:fixed; inset:0; z-index:300; background:var(--navy);">
+  <div class="admin-login">
+    <div class="login-card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
+        <div class="logo-crest"><img src="MEDIA/school logo.jpg" alt="School Logo" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="logo-crest"><img src="MEDIA/command logo.jpg" alt="Command Logo" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Admin Portal</div>
+          <div style="font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem">NTSCRA</div>
+        </div>
+      </div>
+      <h2>Admin Sign In</h2>
+      <p>Enter your credentials to access the exam management dashboard.</p>
+      <div id="login-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="admin-user" placeholder="admin" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="admin-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" style="flex:1" onclick="doAdminLogin()">Sign In</button>
+        <button class="btn-secondary" onclick="showPage('home')">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ STUDENT AUTH GATE -->
+<div id="student-auth-page" style="display:none; position:fixed; inset:0; z-index:400; background:var(--navy); overflow-y:auto;">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <!-- Logos -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:1.4rem">
+        <div class="logo-crest"><img src="MEDIA/school logo.jpg" alt="School Logo" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="logo-crest"><img src="MEDIA/command logo.jpg" alt="Command Logo" style="width:100%;height:100%;object-fit:cover;"></div>
+      </div>
+      <div style="text-align:center;margin-bottom:1.8rem">
+        <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--gold)">NTSCRA Exam Portal</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Nigeria Theology School of Chaplaincy & Rescue Academy</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Student Login</button>
+        <button class="auth-tab" id="tab-enroll" onclick="switchAuthTab('enroll')">New Enrollment</button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div id="auth-login-panel">
+        <div class="modal-sub" style="margin-top:1.2rem">Enter your registered email and matric number to access the portal.</div>
+        <div id="login-student-error" class="alert alert-error" style="display:none"></div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="sl-email" placeholder="student@email.com" onkeydown="if(event.key==='Enter')doStudentLogin()">
+        </div>
+        <div class="form-group">
+          <label>Matric Number</label>
+          <input type="text" id="sl-matric" placeholder="e.g. NTS/2026/001" onkeydown="if(event.key==='Enter')doStudentLogin()">
+        </div>
+        <button class="btn-primary" style="width:100%;margin-top:0.5rem" onclick="doStudentLogin()">Login →</button>
+      </div>
+
+      <!-- ENROLLMENT PANEL -->
+      <div id="auth-enroll-panel" style="display:none">
+        <div class="modal-sub" style="margin-top:1.2rem">Create your student profile. Your matric number will be generated automatically.</div>
+        <div id="enroll-error" class="alert alert-error" style="display:none"></div>
+        <div id="enroll-success" class="alert alert-success" style="display:none"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="en-firstname" placeholder="John">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="en-lastname" placeholder="Doe">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="en-email" placeholder="student@email.com">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="en-phone" placeholder="+234 800 000 0000">
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="en-gender">
+            <option value="">Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <button class="btn-primary" style="width:100%;margin-top:0.5rem" onclick="doEnroll()">Enroll & Get Matric Number →</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="announce-bar" id="announce-bar">
+  <div class="announce-track">
+    <span>📢 ADMISSION IN PROGRESS. ENROLL FOR NEXT BATCH. &nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp; 📢 ADMISSION IN PROGRESS. ENROLL FOR NEXT BATCH. &nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp; 📢 ADMISSION IN PROGRESS. ENROLL FOR NEXT BATCH. &nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp; 📢 ADMISSION IN PROGRESS. ENROLL FOR NEXT BATCH. &nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;</span>
+  </div>
+</div>
+
+<!-- SITE HEADER -->
+<header class="site-header" id="main-header">
+  <div class="logo-block">
+    <div class="logo-crest"><img src="MEDIA/school logo.jpg" alt="School Logo" style="width:100%;height:100%;object-fit:cover;"></div>
+    <div class="logo-crest"><img src="MEDIA/command logo.jpg" alt="Command Logo" style="width:100%;height:100%;object-fit:cover;"></div>
+    <div class="logo-text">
+      <div class="logo-name">Nigeria Theology School of Chaplaincy & Rescue Academy — Exam Portal</div>
+    </div>
+  </div>
+  <nav class="header-nav" id="header-nav">
+    <button class="nav-btn active" onclick="showPage('home')">Home</button>
+    <button class="nav-btn" onclick="showPage('courses')">Courses</button>
+    <button class="nav-btn" onclick="showAdminLogin()">Admin</button>
+    <div class="student-badge" id="student-badge" style="display:none">
+      <span id="student-badge-name"></span>
+      <button class="nav-btn danger" onclick="studentLogout()">Logout</button>
+    </div>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════════════ HOME -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:1.8rem">
+      <img src="MEDIA/school logo.jpg" alt="School Logo" style="width:90px;height:90px;object-fit:cover;border-radius:8px;box-shadow:0 0 0 2px rgba(201,168,76,0.35);">
+      <img src="MEDIA/command logo.jpg" alt="Command Logo" style="width:90px;height:90px;object-fit:cover;border-radius:8px;box-shadow:0 0 0 2px rgba(201,168,76,0.35);">
+    </div>
+    <div class="hero-badge">📜 Certified Examination Portal</div>
+    <h1>Nigeria Theology School of Chaplaincy & Rescue Academy</h1>
+    <p>Welcome to the official NTSCRA examination platform. All assessments are timed, strictly monitored, and can be attempted only once. Ensure you are ready before beginning.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="showPage('courses')">Browse Courses →</button>
+      <button class="btn-secondary" onclick="showAdminLogin()">Admin Dashboard</button>
+    </div>
+    <div style="margin-top:3rem;display:flex;gap:2.5rem;justify-content:center;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:1.6rem;color:var(--gold);font-weight:600">60 min</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Exam Duration</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:1.6rem;color:var(--gold);font-weight:600">1×</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Attempt Only</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:1.6rem;color:var(--gold);font-weight:600">50%</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Pass Mark</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:1.6rem;color:var(--gold);font-weight:600">9</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Exam Modules</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ COURSES -->
+<div id="page-courses" class="page">
+  <div class="page-content">
+    <div class="page-title">Rescue Operations</div>
+    <div class="page-subtitle">Select a course below, then choose an exam module to begin your timed assessment.</div>
+    <div class="courses-grid" id="courses-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ EXAM -->
+<div id="page-exam" class="page">
+  <div class="exam-topbar">
+    <div class="exam-title-wrap">
+      <div class="exam-course-code" id="exam-code-display"></div>
+      <div class="exam-course-name" id="exam-name-display"></div>
+    </div>
+    <div class="timer-wrap">
+      <div class="timer-label">Time Left</div>
+      <div class="timer-display" id="timer-display">60:00</div>
+    </div>
+  </div>
+  <div class="exam-progress-bar"><div class="exam-progress-fill" id="exam-progress" style="width:0%"></div></div>
+  <div class="exam-body">
+    <div class="exam-sidebar">
+      <div class="sidebar-title">Questions</div>
+      <div class="q-nav" id="q-nav"></div>
+      <div class="divider"></div>
+      <div class="sidebar-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Current</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(74,222,128,0.4)"></div> Answered</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(245,158,11,0.3)"></div> Flagged</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.05)"></div> Unanswered</div>
+      </div>
+      <div class="divider"></div>
+      <div id="sidebar-answered" style="font-size:12px;color:var(--muted)">0 / 0 answered</div>
+    </div>
+    <div class="exam-main" id="exam-main">
+      <div class="question-card" id="question-card">
+        <div class="q-number" id="q-number-display"></div>
+        <div class="q-text" id="q-text"></div>
+        <div class="options-list" id="options-list"></div>
+        <div class="exam-nav-bar">
+          <button class="exam-nav-btn" id="btn-prev" onclick="navigate(-1)">← Previous</button>
+          <div style="display:flex;gap:8px">
+            <button class="exam-nav-btn flag-btn" id="btn-flag" onclick="toggleFlag()">🚩 Flag</button>
+            <button class="exam-nav-btn" id="btn-next" onclick="navigate(1)">Next →</button>
+          </div>
+          <button class="submit-btn-exam" onclick="confirmSubmit()">Submit Exam</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ RESULT -->
+<div id="page-result" class="page">
+  <div class="result-card">
+    <div class="result-icon" id="result-icon"></div>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-label">Final Score</div>
+    <div class="result-verdict" id="result-verdict"></div>
+    <div class="result-stats">
+      <div class="result-stat">
+        <div class="result-stat-val" id="res-correct">0</div>
+        <div class="result-stat-lbl">Correct</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-val" id="res-wrong">0</div>
+        <div class="result-stat-lbl">Wrong</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-val" id="res-unanswered">0</div>
+        <div class="result-stat-lbl">Skipped</div>
+      </div>
+    </div>
+    <div class="result-note" id="result-note"></div>
+    <div style="margin-top:1.8rem;display:flex;gap:10px;justify-content:center">
+      <button class="btn-primary" onclick="showPage('courses')">Back to Courses</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ ADMIN -->
+<div id="page-admin" class="page">
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div style="padding:0 4px;margin-bottom:1.5rem">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Management</div>
+      </div>
+      <div class="admin-nav-item active" onclick="adminNav('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="admin-nav-item" onclick="adminNav('results')"><span class="nav-icon">📋</span> Exam Results</div>
+      <div class="admin-nav-item" onclick="adminNav('students')"><span class="nav-icon">👥</span> Students</div>
+      <div class="admin-nav-item" onclick="adminNav('questions')"><span class="nav-icon">❓</span> Questions</div>
+      <div class="admin-nav-item" onclick="adminNav('settings')"><span class="nav-icon">⚙️</span> Settings</div>
+      <div class="divider"></div>
+      <div class="admin-nav-item" onclick="adminLogout()"><span class="nav-icon">🚪</span> Logout</div>
+    </div>
+    <div class="admin-content">
+
+      <!-- DASHBOARD -->
+      <div class="admin-section active" id="admin-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle" id="dash-date"></div>
+        <div class="stats-grid" id="dash-stats"></div>
+        <div class="page-title" style="font-size:1.2rem;margin-bottom:1rem">Recent Activity</div>
+        <div class="table-wrap"><table class="results-table" id="recent-table">
+          <thead><tr><th>Student</th><th>Course</th><th>Score</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="recent-tbody"></tbody>
+        </table></div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="admin-section" id="admin-results">
+        <div class="page-title">Exam Results</div>
+        <div class="page-subtitle">All student exam submissions. Export to CSV for records.</div>
+        <div class="table-controls">
+          <input type="text" class="table-search" id="results-search" placeholder="Search name, matric, course..." oninput="filterResults()">
+          <div class="table-actions">
+            <div class="filter-row" style="margin:0">
+              <select class="filter-select" id="filter-course" onchange="filterResults()">
+                <option value="">All Courses</option>
+              </select>
+              <select class="filter-select" id="filter-status" onchange="filterResults()">
+                <option value="">All Status</option>
+                <option value="Pass">Pass</option>
+                <option value="Fail">Fail</option>
+              </select>
+            </div>
+            <button class="action-btn primary" onclick="exportCSV()">⬇ Export CSV</button>
+            <button class="action-btn danger-btn" onclick="confirmClearResults()">🗑 Clear All</button>
+          </div>
+        </div>
+        <div class="table-wrap"><table class="results-table">
+          <thead><tr><th>#</th><th>Name</th><th>Matric No</th><th>Course Code</th><th>Course Name</th><th>Score</th><th>Status</th><th>Duration</th><th>Date & Time</th></tr></thead>
+          <tbody id="results-tbody"></tbody>
+        </table></div>
+      </div>
+
+      <!-- STUDENTS -->
+      <div class="admin-section" id="admin-students">
+        <div class="page-title">Student Records</div>
+        <div class="page-subtitle">All enrolled students and their exam performance.</div>
+        <div class="table-controls">
+          <input type="text" class="table-search" id="students-search" placeholder="Search name, matric, email..." oninput="filterStudents()">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="action-btn danger-btn" onclick="confirmClearStudents()">🔄 Reset Attempts</button>
+            <button class="action-btn danger-btn" onclick="confirmDeleteStudents()">🗑 Delete Enrollments</button>
+          </div>
+        </div>
+        <div class="table-wrap"><table class="results-table">
+          <thead><tr><th>Name</th><th>Matric No</th><th>Email</th><th>Phone</th><th>Status</th><th>Exams</th><th>Avg Score</th><th>Enrolled</th></tr></thead>
+          <tbody id="students-tbody"></tbody>
+        </table></div>
+      </div>
+
+      <!-- QUESTIONS -->
+      <div class="admin-section" id="admin-questions">
+        <div class="page-title">Question Bank</div>
+        <div class="page-subtitle">Manage exam questions per course module.</div>
+        <div style="margin-bottom:1.2rem;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <select class="filter-select" id="q-course-filter" onchange="loadQuestions()">
+            <option value="">Select Course Module</option>
+          </select>
+          <button class="action-btn primary" onclick="showAddQuestion()">+ Add Question</button>
+        </div>
+        <div id="add-q-form" style="display:none" class="q-form">
+          <div class="page-title" style="font-size:1rem;margin-bottom:1rem">Add New Question</div>
+          <div class="form-group">
+            <label>Question Text</label>
+            <textarea id="q-text-input" placeholder="Enter the question..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Option A</label><input type="text" id="opt-a" placeholder="Option A"></div>
+            <div class="form-group"><label>Option B</label><input type="text" id="opt-b" placeholder="Option B"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Option C</label><input type="text" id="opt-c" placeholder="Option C"></div>
+            <div class="form-group"><label>Option D</label><input type="text" id="opt-d" placeholder="Option D"></div>
+          </div>
+          <div class="form-group">
+            <label>Correct Answer</label>
+            <select id="correct-ans">
+              <option value="A">A</option><option value="B">B</option>
+              <option value="C">C</option><option value="D">D</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="action-btn primary" onclick="saveQuestion()">Save Question</button>
+            <button class="action-btn" onclick="document.getElementById('add-q-form').style.display='none'">Cancel</button>
+          </div>
+        </div>
+        <div class="q-list" id="q-list"></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="admin-section" id="admin-settings">
+        <div class="page-title">Exam Settings</div>
+        <div class="page-subtitle">Configure global exam parameters.</div>
+        <div class="q-form" style="max-width:480px">
+          <div class="form-group">
+            <label>Exam Duration (minutes)</label>
+            <input type="number" id="set-duration" value="60" min="5" max="180">
+          </div>
+          <div class="form-group">
+            <label>Pass Mark (%)</label>
+            <input type="number" id="set-passmark" value="50" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label>Questions per Exam</label>
+            <input type="number" id="set-qcount" value="20" min="5" max="50">
+          </div>
+          <div class="form-group">
+            <label>Admin Password (change)</label>
+            <input type="password" id="set-newpass" placeholder="Leave blank to keep current">
+          </div>
+          <button class="action-btn primary" onclick="saveSettings()">Save Settings</button>
+          <div id="settings-alert" style="margin-top:1rem"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-register">
+  <div class="modal">
+    <h2>Student Registration</h2>
+    <div class="modal-sub">Please provide your details before starting the exam. This information will be recorded.</div>
+    <div id="reg-error" class="alert alert-error" style="display:none"></div>
+    <div class="exam-info-box">
+      Exam: <strong id="reg-exam-name">—</strong><br>
+      Duration: <strong id="reg-duration">60 minutes</strong> | Attempts: <strong>1 (once only)</strong>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" id="reg-firstname" placeholder="John">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" id="reg-lastname" placeholder="Doe">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Matric / Student Number</label>
+      <input type="text" id="reg-matric" placeholder="e.g. NTS/2024/001">
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="reg-email" placeholder="student@email.com">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" style="flex:1" onclick="startExam()">Begin Exam →</button>
+      <button class="btn-secondary" onclick="closeModal('modal-register')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirm-submit">
+  <div class="modal confirm-modal">
+    <h3>Submit Exam?</h3>
+    <p id="submit-warning">You are about to submit your exam. This cannot be undone.<br><span id="unanswered-warn" style="color:#f59e0b"></span></p>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn-primary" onclick="submitExam()">Yes, Submit</button>
+      <button class="btn-secondary" onclick="closeModal('modal-confirm-submit')">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirm-clear">
+  <div class="modal confirm-modal">
+    <h3 id="clear-title">Clear All Results?</h3>
+    <p id="clear-msg">This will permanently delete all exam results. This action cannot be undone.</p>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn-primary" style="background:var(--red);box-shadow:none" id="clear-confirm-btn">Delete</button>
+      <button class="btn-secondary" onclick="closeModal('modal-confirm-clear')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════════
+const COURSES = [
+  {
+    id: 'rescue-ops',
+    title: 'Rescue Operations',
+    icon: '🚨',
+    desc: 'Core rescue techniques, emergency response, and disaster management skills for frontline chaplaincy practitioners.',
+    modules: [
+      { code: '101', name: 'Basic First Aid' },
+      { code: '103', name: 'Rescue Operations' },
+      { code: '105', name: 'Disaster Management / Emergencies' },
+      { code: '201', name: 'Safety Principles' },
+      { code: '203', name: 'Response to Emergency' },
+      { code: '205', name: 'Accident Victims' },
+      { code: '206', name: 'Flooding Safety Tips' },
+      { code: '401', name: 'Safety Management' },
+      { code: '402', name: 'Emergency Management' },
+      { code: '403', name: 'Crisis De-escalation' },
+    ]
+  }
+];
+
+// Default questions bank per module (demo questions — admin can add more)
+const DEFAULT_QUESTIONS = {
+  '101': [
+    { q: 'What is the primary goal of Basic First Aid?', opts: ['To diagnose illness','To preserve life and prevent further harm','To provide surgical care','To administer medication'], ans: 'B' },
+    { q: 'What does the acronym "ABC" stand for in first aid?', opts: ['Airway, Bleeding, Circulation','Airway, Breathing, Circulation','Assist, Breathe, Compress','Alert, Bandage, Call'], ans: 'B' },
+    { q: 'How many chest compressions per minute are recommended during CPR?', opts: ['60–80','80–100','100–120','120–140'], ans: 'C' },
+    { q: 'Which position is used for an unconscious breathing casualty?', opts: ['Supine position','Prone position','Recovery position','Fowler\'s position'], ans: 'C' },
+    { q: 'What should you do FIRST when approaching an accident scene?', opts: ['Start CPR immediately','Ensure the scene is safe','Call the nearest hospital','Move the victim'], ans: 'B' },
+    { q: 'For a minor burn, the correct first aid is:', opts: ['Apply butter or oil','Apply ice directly','Cool with running water for 10–20 min','Cover with a tight bandage'], ans: 'C' },
+    { q: 'A tourniquet is used to:', opts: ['Immobilize a fracture','Control severe bleeding from a limb','Cool a burn wound','Prevent infection'], ans: 'B' },
+    { q: 'What is the ratio of chest compressions to rescue breaths for an adult in CPR?', opts: ['15:2','5:1','30:2','20:4'], ans: 'C' },
+    { q: 'When treating a suspected spinal injury, you should:', opts: ['Move the person quickly','Keep the head and neck still','Elevate the legs','Apply firm pressure to the spine'], ans: 'B' },
+    { q: 'Choking in a conscious adult is treated with:', opts: ['Mouth-to-mouth resuscitation','Back blows and abdominal thrusts','Chest compressions only','Fluid intake'], ans: 'B' },
+    { q: 'Which of the following is a sign of shock?', opts: ['Flushed, dry skin','High blood pressure','Rapid, weak pulse','Slow, deep breathing'], ans: 'C' },
+    { q: 'The universal sign for choking is:', opts: ['Clutching the throat with both hands','Waving both arms','Pointing to the chest','Coughing loudly'], ans: 'A' },
+    { q: 'What does RICE stand for in musculoskeletal injuries?', opts: ['Rest, Ice, Compression, Elevation','Run, Inflate, Cool, Exam','Rest, Inflate, Check, Elevate','Relax, Ice, Compress, Expose'], ans: 'A' },
+    { q: 'How should you remove a ring or tight clothing from an injured limb?', opts: ['Cut it off if necessary before swelling','Leave it on at all times','Apply lubricant only','Wait for a doctor'], ans: 'A' },
+    { q: 'Anaphylaxis is best treated in the field with:', opts: ['Antihistamine tablets','Aspirin','Epinephrine (adrenaline) auto-injector','Cold compress'], ans: 'C' },
+    { q: 'The "D" in the DRABC framework stands for:', opts: ['Diagnose','Danger','Drive','Decide'], ans: 'B' },
+    { q: 'Which is the correct action for a nose bleed?', opts: ['Tilt head back and plug nostrils','Lean forward and pinch the soft part of the nose','Lie flat on the back','Apply heat to the nose'], ans: 'B' },
+    { q: 'A fracture should be immobilized:', opts: ['Only if the bone is visible','In the position found, if movement would cause further harm','Always straight regardless of position','Only after X-ray'], ans: 'B' },
+    { q: 'What color indicates a non-urgent (minor) triage tag?', opts: ['Red','Yellow','Green','Black'], ans: 'C' },
+    { q: 'When giving rescue breaths, each breath should last approximately:', opts: ['0.5 seconds','1 second','3 seconds','5 seconds'], ans: 'B' },
+  ],
+  '103': [
+    { q: 'What is the Incident Command System (ICS) used for?', opts: ['Medical diagnosis','Coordinating emergency response','Designing rescue equipment','Training new recruits'], ans: 'B' },
+    { q: 'The primary consideration before entering a rescue scene is:', opts: ['Speed of rescue','Scene safety','Availability of medical supplies','Number of victims'], ans: 'B' },
+    { q: 'A "hot zone" in a rescue operation refers to:', opts: ['Area where command post is located','Area of immediate danger','Medical treatment area','Staging area for equipment'], ans: 'B' },
+    { q: 'What does LAST stand for in search and rescue?', opts: ['Locate, Access, Stabilize, Transport','Look, Assess, Search, Tag','Locate, Analyze, Secure, Treat','Lead, Assess, Stabilize, Triage'], ans: 'A' },
+    { q: 'When extracting a trapped victim, which is the correct order?', opts: ['Transport, stabilize, access, locate','Locate, access, stabilize, transport','Access, stabilize, locate, transport','Stabilize, locate, access, transport'], ans: 'B' },
+    { q: 'A Stokes basket is used for:', opts: ['Water purification','Patient packaging in technical rescue','Carrying equipment up ladders','Triaging multiple casualties'], ans: 'B' },
+    { q: 'Rope rescue requires a minimum safety factor of:', opts: ['5:1','10:1','15:1','2:1'], ans: 'B' },
+    { q: 'What is the purpose of a "scene size-up"?', opts: ['Counting the number of rescuers','Quickly assessing scene safety and resources needed','Completing a patient assessment form','Contacting media'], ans: 'B' },
+    { q: 'Which knot is commonly used in rescue operations for its reliability?', opts: ['Slip knot','Figure-8 knot','Overhand knot','Granny knot'], ans: 'B' },
+    { q: 'What agency coordinates national disaster response in Nigeria?', opts: ['NAFDAC','NEMA','CBN','NCC'], ans: 'B' },
+    { q: 'Victim who is trapped should be treated as having a spinal injury:', opts: ['Never','Always, until proven otherwise','Only if unconscious','Only in vehicular incidents'], ans: 'B' },
+    { q: 'A "secondary search" in rescue operations means:', opts: ['First systematic search of the area','Thorough search after initial rescue','Search conducted by a second team only','Searching for equipment'], ans: 'B' },
+    { q: 'PPE in rescue operations primarily protects:', opts: ['The victims only','The rescuers only','Both rescuers and victims','The equipment'], ans: 'C' },
+    { q: 'What is rapid intervention in confined space rescue?', opts: ['Sending in the fastest rescuer','A standby team ready to rescue rescuers in distress','Using ropes to speed entry','Radio communication protocol'], ans: 'B' },
+    { q: 'What does "span of control" mean in ICS?', opts: ['The length of a rescue rope','Number of people one supervisor can effectively manage','Distance rescuers must maintain','Scope of the rescue operation'], ans: 'B' },
+    { q: 'The "golden hour" in trauma rescue refers to:', opts: ['The first hour of daylight','The critical first hour after injury for definitive care','The time taken to debrief rescuers','One hour of CPR'], ans: 'B' },
+    { q: 'Which is the safest method to move a victim with suspected spinal injury?', opts: ['Drag by the arms','Log roll with team coordination','Carry on the back','Pull by the legs'], ans: 'B' },
+    { q: 'A manifest listing missing persons helps rescue teams:', opts: ['Estimate budget','Prioritize and account for all individuals','Manage media relations','Calculate insurance claims'], ans: 'B' },
+    { q: 'What is a "morgue" designation in mass casualty triage?', opts: ['Minor injuries area','Area for deceased victims','Field hospital','Command post'], ans: 'B' },
+    { q: 'Rescue operations debrief is important because it:', opts: ['Provides entertainment for the team','Documents lessons learned and improves future responses','Is legally mandatory in all cases','Compensates rescuers'], ans: 'B' },
+  ],
+  '105': [
+    { q: 'A disaster is defined as:', opts: ['Any accident involving one person','An event that overwhelms local response capacity','A planned emergency drill','A minor industrial incident'], ans: 'B' },
+    { q: 'The Sendai Framework for Disaster Risk Reduction covers the period:', opts: ['2000–2015','2005–2015','2015–2030','2020–2035'], ans: 'C' },
+    { q: 'Which is a natural disaster?', opts: ['Building collapse due to poor design','Chemical plant explosion','Earthquake','Oil pipeline fire'], ans: 'C' },
+    { q: 'The phase before a disaster where activities reduce risk is called:', opts: ['Response','Recovery','Mitigation','Rehabilitation'], ans: 'C' },
+    { q: 'An Emergency Operations Centre (EOC) is activated during which phase?', opts: ['Mitigation','Preparedness','Response','Recovery'], ans: 'C' },
+    { q: 'Mass casualty incident (MCI) triage system START stands for:', opts: ['Simple Triage And Rapid Treatment','Safety Triage And Rescue Techniques','Systematic Treatment And Rapid Transport','Simple Transfer And Rescue Triage'], ans: 'A' },
+    { q: 'An evacuation route should be:', opts: ['The shortest distance only','Clearly marked, multiple options, leading to safety','Kept secret from the public','Only accessible to trained staff'], ans: 'B' },
+    { q: 'Which organization leads international humanitarian response?', opts: ['NATO','UN OCHA','Interpol','World Bank'], ans: 'B' },
+    { q: 'Business Continuity Planning (BCP) is primarily aimed at:', opts: ['Protecting profits only','Ensuring critical functions continue during/after a disaster','Reducing insurance premiums','Documenting disaster history'], ans: 'B' },
+    { q: 'Community early warning systems save lives by:', opts: ['Predicting weather perfectly','Giving communities time to act before a hazard strikes','Replacing emergency services','Training professionals only'], ans: 'B' },
+    { q: 'Which is the correct disaster management cycle order?', opts: ['Response, Mitigation, Preparedness, Recovery','Mitigation, Preparedness, Response, Recovery','Preparedness, Mitigation, Recovery, Response','Recovery, Response, Preparedness, Mitigation'], ans: 'B' },
+    { q: 'Shelter-in-place means:', opts: ['Evacuating to a shelter building','Remaining indoors in a safe location during an emergency','Camping outdoors','Relocating permanently'], ans: 'B' },
+    { q: 'A disaster drill or tabletop exercise is used to:', opts: ['Entertain emergency workers','Test and evaluate emergency plans','Record past disasters','Train first responders in CPR only'], ans: 'B' },
+    { q: 'Psychosocial support after a disaster addresses:', opts: ['Physical injuries only','The mental and emotional needs of survivors','Infrastructure rebuilding','Financial compensation'], ans: 'B' },
+    { q: 'Which agency manages disaster response in Lagos State, Nigeria?', opts: ['LASG Ministry of Finance','LASEMA','LASTMA','LAWMA'], ans: 'B' },
+    { q: 'During an emergency broadcast, people should:', opts: ['Change the channel','Follow official instructions immediately','Spread information via social media first','Ignore instructions if busy'], ans: 'B' },
+    { q: 'A hazard vulnerability assessment (HVA) helps identify:', opts: ['Staff salaries','Potential threats and community weaknesses','Tourism opportunities','Building designs'], ans: 'B' },
+    { q: 'The Sphere Handbook sets minimum standards for:', opts: ['Military operations','Humanitarian response in disasters','Corporate emergency planning','Environmental protection'], ans: 'B' },
+    { q: 'Which is an example of structural mitigation?', opts: ['Public awareness campaign','Building seawalls against flooding','Training emergency responders','Stockpiling food supplies'], ans: 'B' },
+    { q: 'After a disaster, the "recovery" phase focuses on:', opts: ['Immediate life-saving activities','Restoring normalcy and building back better','Evacuation of casualties','Activating the EOC'], ans: 'B' },
+  ],
+  '201': [
+    { q: 'Safety management is best described as:', opts: ['A reactive process after accidents','A proactive approach to identifying and controlling hazards','A legal requirement only','Primarily the concern of senior management'], ans: 'B' },
+    { q: 'The primary purpose of a Job Safety Analysis (JSA) is to:', opts: ['Increase worker productivity','Identify hazards and establish safe procedures for specific tasks','Document work hours','Measure equipment performance'], ans: 'B' },
+    { q: 'Hierarchy of controls lists which control as most effective?', opts: ['PPE','Administrative controls','Engineering controls','Elimination'], ans: 'D' },
+    { q: 'PPE is considered:', opts: ['The first line of defense','The last line of defense','An optional protective measure','Only required for senior staff'], ans: 'B' },
+    { q: 'A near-miss should be:', opts: ['Ignored since no injury occurred','Reported and investigated as a potential future accident','Only reported if witnessed by a supervisor','Kept confidential'], ans: 'B' },
+    { q: 'The term "hazard" is defined as:', opts: ['The actual harm that occurred','A potential source of harm or adverse effect','A risk control measure','A personal protective device'], ans: 'B' },
+    { q: 'Risk is calculated as:', opts: ['Hazard + Control','Likelihood × Severity','Frequency – Control','Probability + Exposure'], ans: 'B' },
+    { q: 'Which color on a safety sign indicates a mandatory action?', opts: ['Red','Yellow','Blue','Green'], ans: 'C' },
+    { q: 'A Safety Data Sheet (SDS) provides information about:', opts: ['Equipment maintenance schedules','Hazardous chemical properties and safe handling','Salary scales for safety officers','Fire escape routes'], ans: 'B' },
+    { q: 'Lockout/Tagout (LOTO) procedures are used to:', opts: ['Secure fire exits','Control hazardous energy during maintenance','Manage chemical spills','Issue work permits'], ans: 'B' },
+    { q: 'OSHA stands for:', opts: ['Operational Safety and Health Agency','Occupational Safety and Health Administration','Office of Safety, Hazards and Accidents','Organized Safety for Healthy Activities'], ans: 'B' },
+    { q: 'What does a "permit to work" system ensure?', opts: ['Workers are paid correctly','Hazardous work is properly authorized and controlled','Equipment is serviced regularly','All accidents are reported'], ans: 'B' },
+    { q: 'Ergonomics in safety management focuses on:', opts: ['Decorating the workplace','Adapting work and environment to fit human capabilities','Reducing training costs','Increasing production targets'], ans: 'B' },
+    { q: 'The Safety Triangle concept (Heinrich\'s Triangle) suggests:', opts: ['Most accidents are fatal','For every major accident there are many near-misses and minor incidents','All accidents are preventable by PPE only','Near-misses do not predict major accidents'], ans: 'B' },
+    { q: 'Emergency stop buttons on machinery should be:', opts: ['Hidden to prevent accidental activation','Clearly marked, accessible, and tested regularly','Operated only by supervisors','Permanently locked when not in use'], ans: 'B' },
+    { q: 'A toolbox talk is:', opts: ['A discussion about purchasing new tools','A brief safety meeting before starting a task','A written safety manual','A formal disciplinary process'], ans: 'B' },
+    { q: 'Fire exits must be:', opts: ['Locked for security','Clearly marked and always unobstructed','Only used by trained staff','Opened only by the fire marshal'], ans: 'B' },
+    { q: 'A safety audit is best described as:', opts: ['An informal walk-through','A systematic review of safety compliance and practices','A punishment for unsafe behavior','An annual medical examination'], ans: 'B' },
+    { q: 'Behavior-Based Safety (BBS) focuses on:', opts: ['Purchasing safety equipment','Observing and reinforcing safe behaviors of workers','Punishing unsafe acts','Technical engineering controls only'], ans: 'B' },
+    { q: 'Which document records all workplace accidents and near-misses?', opts: ['Payroll register','Accident/Incident log book','Safety training certificates','Equipment maintenance log'], ans: 'B' },
+  ],
+  '203': [
+    { q: 'The first step when responding to any emergency is:', opts: ['Call for help immediately','Assess the situation for safety','Begin treatment of victims','Gather bystanders'], ans: 'B' },
+    { q: 'In Nigeria, the emergency telephone number is:', opts: ['999','112','911','199'], ans: 'B' },
+    { q: 'A triage system categorizes victims by:', opts: ['Age and gender','Urgency of medical need','Time of arrival','Physical size'], ans: 'B' },
+    { q: 'In mass casualty triage, a BLACK tag means:', opts: ['Immediate life-threatening injury','Minor injury','Deceased or unsurvivable injury','Delayed non-critical injury'], ans: 'C' },
+    { q: 'Which action is taken for a RED tagged victim?', opts: ['Observe and delay treatment','Provide immediate life-saving intervention','Document and tag only','Prepare for evacuation tomorrow'], ans: 'B' },
+    { q: 'When is it safe to move an accident victim?', opts: ['As soon as possible to reduce exposure','Only when the scene is safe and spinal injury is unlikely or managed','Whenever bystanders request it','After taking photographs'], ans: 'B' },
+    { q: 'Incident Command System (ICS) is valuable in emergency response because it:', opts: ['Replaces the need for trained responders','Provides a standardized management framework','Is optional for small incidents','Focuses only on communication'], ans: 'B' },
+    { q: 'Unified Command in ICS is used when:', opts: ['A single agency manages the incident','Multiple agencies share incident management authority','There are fewer than 10 responders','Only communication is needed'], ans: 'B' },
+    { q: 'A muster point (assembly area) is used to:', opts: ['Store emergency equipment','Account for all personnel after an emergency evacuation','Brief media representatives','Conduct rescue operations'], ans: 'B' },
+    { q: 'Dispatch centers in emergency response prioritize calls based on:', opts: ['Caller\'s tone of voice','Nature and severity of the emergency','Time of day','Distance from the station'], ans: 'B' },
+    { q: 'An after-action review (AAR) after an emergency is conducted to:', opts: ['Assign blame','Identify lessons learned and improve future responses','Complete payroll processing','Document media coverage'], ans: 'B' },
+    { q: 'Which of the following best describes "mutual aid" in emergency response?', opts: ['Training together in peacetime','Agencies providing support to each other during incidents beyond local capacity','Sharing equipment permanently','Joint financial management'], ans: 'B' },
+    { q: 'The SBAR communication tool stands for:', opts: ['Safety, Breathe, Assess, Report','Situation, Background, Assessment, Recommendation','Scene, Bystander, Action, Recovery','Secure, Brief, Assist, Respond'], ans: 'B' },
+    { q: 'Which is the correct order for victim prioritization?', opts: ['Minor, Delayed, Immediate, Deceased','Immediate, Delayed, Minor, Deceased','Deceased, Immediate, Delayed, Minor','Delayed, Immediate, Minor, Deceased'], ans: 'B' },
+    { q: 'Decontamination in emergency response is done to:', opts: ['Clean equipment after use','Remove hazardous substances from victims and responders','Improve scene lighting','Prepare for media briefings'], ans: 'B' },
+    { q: 'The staging area in an incident command is used for:', opts: ['Treating patients','Holding resources until needed','Holding media briefings','Logging casualties'], ans: 'B' },
+    { q: 'What is the main goal of a Joint Information Center (JIC) in emergencies?', opts: ['Coordinate medical care','Provide coordinated public information and media messaging','Direct field operations','Manage logistics'], ans: 'B' },
+    { q: 'During a chemical emergency, responders should approach from:', opts: ['Downwind direction','Upwind direction','Any direction if wearing PPE','Directly from the source'], ans: 'B' },
+    { q: 'A hot zone in a HazMat incident requires responders to:', opts: ['Wear no special equipment if the substance is unknown','Use appropriate level of PPE and minimize time of exposure','Enter without PPE for speed','Stay permanently until all victims are removed'], ans: 'B' },
+    { q: 'Who has overall authority at an incident scene under ICS?', opts: ['Highest-ranking police officer','Incident Commander','Senior medical officer','Mayor or Governor'], ans: 'B' },
+  ],
+  '205': [
+    { q: 'When approaching a road accident victim, your first concern is:', opts: ['Checking the vehicle','Ensuring scene safety and securing traffic','Photographing the accident','Interviewing witnesses'], ans: 'B' },
+    { q: 'Traumatic arrest from a road accident differs from medical cardiac arrest because:', opts: ['CPR is never used','It may involve hemorrhage, tension pneumothorax, and other injuries requiring specific treatment','It only affects the elderly','No defibrillation is needed'], ans: 'B' },
+    { q: 'Hemorrhagic shock in an accident victim is managed by:', opts: ['Elevating the head','Controlling bleeding and maintaining circulation/volume','Applying cold compress to the torso','Withholding fluids'], ans: 'B' },
+    { q: 'A tension pneumothorax is recognized by:', opts: ['Slow breathing and low pulse','Tracheal deviation, reduced breath sounds, respiratory distress','Coughing blood only','Normal vital signs with confusion'], ans: 'B' },
+    { q: 'The AVPU scale measures:', opts: ['Respiratory rate','Level of consciousness (Alert, Voice, Pain, Unresponsive)','Blood pressure categories','Temperature ranges'], ans: 'B' },
+    { q: 'Flail chest occurs when:', opts: ['The sternum is bruised','Two or more adjacent ribs are fractured in two places, causing paradoxical movement','The trachea is blocked','The diaphragm is injured'], ans: 'B' },
+    { q: 'What is the ideal position for a victim in hypovolemic shock?', opts: ['Sitting upright','Supine with legs elevated (Trendelenburg, if no spinal injury)','On their side','Prone (face down)'], ans: 'B' },
+    { q: 'When immobilizing a cervical spine injury in the field, you should use:', opts: ['A makeshift cloth bandage only','A properly fitted cervical collar and spinal board','Adhesive tape around the head','Nothing until hospital assessment'], ans: 'B' },
+    { q: 'Crush syndrome (traumatic rhabdomyolysis) occurs when:', opts: ['A bone is fractured','Prolonged muscle compression leads to release of myoglobin into circulation, risking kidney failure','Minor abrasions become infected','Dehydration occurs at an accident scene'], ans: 'B' },
+    { q: 'What does "load and go" mean in trauma management?', opts: ['Loading victims carefully before transport','Rapid packaging and rapid transport to definitive care with treatment en route','Loading equipment before responding','Waiting at scene until fully stabilized'], ans: 'B' },
+    { q: 'A Glasgow Coma Scale (GCS) score of 8 or below indicates:', opts: ['Mild head injury','Severe head injury requiring airway management consideration','Normal consciousness','Minor confusion only'], ans: 'B' },
+    { q: 'What is the danger of impaled objects?', opts: ['They are always superficial','Removing them may cause increased bleeding; leave in place and stabilize','They should be removed immediately to clean the wound','They do not affect treatment'], ans: 'B' },
+    { q: 'Compartment syndrome is a medical emergency because:', opts: ['It only causes mild pain','Increased pressure in a muscle compartment restricts circulation, leading to tissue death','It always resolves without treatment','It only occurs in the elderly'], ans: 'B' },
+    { q: 'Which vital sign is LAST to deteriorate in hypovolemic shock?', opts: ['Respiratory rate','Urine output','Blood pressure','Pulse rate'], ans: 'C' },
+    { q: 'The primary survey in trauma management follows:', opts: ['SAMPLE','ABCDE (Airway, Breathing, Circulation, Disability, Exposure)','SBAR','RICE'], ans: 'B' },
+    { q: 'Sucking chest wounds should be treated with:', opts: ['Firm bandage only','Three-sided occlusive dressing to prevent air entry while allowing air exit','Leaving open to air','Immediate surgery only'], ans: 'B' },
+    { q: 'Pediatric accident victims require special consideration because:', opts: ['They feel less pain','Their anatomy and physiology differ from adults and they compensate differently in shock','They need no spinal immobilization','They always have the same injuries as adults'], ans: 'B' },
+    { q: 'Permissive hypotension in trauma management means:', opts: ['Aggressively raising blood pressure to normal levels','Allowing a slightly lower-than-normal BP to reduce re-bleeding until surgical control in penetrating trauma','Withholding all fluids','Measuring blood pressure frequently'], ans: 'B' },
+    { q: 'What does "Golden Hour" mean in trauma care?', opts: ['The first hour of daylight after an accident','The critical first hour after traumatic injury when definitive care can most impact survival','One hour of CPR','The time for documentation'], ans: 'B' },
+    { q: 'Mechanism of injury (MOI) helps rescuers by:', opts: ['Determining legal liability','Predicting likely injury patterns based on how the accident occurred','Calculating insurance costs','Identifying the at-fault driver'], ans: 'B' },
+  ],
+  '206': [
+    { q: 'During a flood, the safest immediate action is:', opts: ['Stay in your car in floodwater','Move to higher ground immediately','Swim across flooded roads','Wait in the basement'], ans: 'B' },
+    { q: 'How deep of moving water can knock a person off their feet?', opts: ['1 metre','30 cm (about 6 inches)','1.5 metres','60 cm'], ans: 'B' },
+    { q: 'What depth of floodwater can carry away a vehicle?', opts: ['60 cm','30 cm','1 metre','15 cm'], ans: 'A' },
+    { q: 'What is the most dangerous aspect of flooding?', opts: ['Muddy appearance of water','Underestimating the power and speed of moving water','High temperatures','Noise of floodwater'], ans: 'B' },
+    { q: 'If trapped in a rising floodwater building, you should:', opts: ['Try to swim out','Move to the highest floor and signal for help','Stay on the ground floor','Disregard official instructions'], ans: 'B' },
+    { q: 'Flood water contamination typically contains:', opts: ['Only rainwater','Sewage, chemicals, debris, and disease-causing organisms','Only soil particles','Clean drinkable water'], ans: 'B' },
+    { q: 'After returning to a flood-affected home, the first thing to do is:', opts: ['Turn on all appliances','Ensure the building is structurally safe and utilities are checked','Begin cooking immediately','Open all windows'], ans: 'B' },
+    { q: 'Driving through floodwater is dangerous because:', opts: ['Cars are not waterproof','Water depth is deceptive, road may be washed away, engine can stall','Insurance may not cover it','Traffic laws are suspended'], ans: 'B' },
+    { q: 'A flood watch means:', opts: ['A flood is currently occurring','Conditions are favorable for flooding to occur','All residents must evacuate immediately','Only minor flooding is expected'], ans: 'B' },
+    { q: 'A flood warning (as opposed to a watch) means:', opts: ['Be prepared for possible flooding','Flooding is occurring or expected to occur soon','Flooding has ended','Advisory only — minimal risk'], ans: 'B' },
+    { q: 'Leptospirosis is associated with floodwater because:', opts: ['Cold temperatures cause the disease','Contaminated water contains Leptospira bacteria from animal urine','Flood water lacks oxygen','Standing water causes sunburn'], ans: 'B' },
+    { q: 'Children and the elderly are more vulnerable during floods because:', opts: ['They are better swimmers','They may have limited mobility and less physical strength','They require less water','They do not need emergency assistance'], ans: 'B' },
+    { q: 'Which of these should be in a flood emergency kit?', opts: ['Luxury items','Water, first aid kit, flashlight, non-perishable food, documents, medications','Only a cell phone','Entertainment devices only'], ans: 'B' },
+    { q: 'Mold growth after flooding is a health concern because:', opts: ['It damages furniture only','It can cause respiratory problems and allergic reactions','It only affects structural walls','It has no health effects'], ans: 'B' },
+    { q: 'During a flood, electrical safety requires:', opts: ['Continuing normal use of electronics','Turning off electricity at the main switch if flooding threatens your home','Using electrical appliances as long as they appear dry','Ignoring warnings from the power company'], ans: 'B' },
+    { q: 'Community flood preparedness includes:', opts: ['Individual planning only','Developing community emergency plans, early warning systems, and evacuation routes','Building walls only','Ignoring weather forecasts'], ans: 'B' },
+    { q: 'Which disease commonly spreads in flood aftermath?', opts: ['Malaria only','Cholera, typhoid, and other waterborne diseases','Diabetes','Heart disease exclusively'], ans: 'B' },
+    { q: 'When evacuating due to flooding, you should avoid:', opts: ['Carrying essential documents','Walking through flowing water above the knee','Using designated evacuation routes','Following official instructions'], ans: 'B' },
+    { q: 'Flood-resistant construction techniques include:', opts: ['Building in low-lying flood plains with no modifications','Elevating structures, using flood barriers, and water-resistant materials','Using wood for all components','Avoiding drainage systems'], ans: 'B' },
+    { q: 'Welfare and psychosocial support after flooding is important to address:', opts: ['Only physical health needs','Trauma, stress, and mental health impacts of displacement and loss','Financial compensation exclusively','Media coverage'], ans: 'B' },
+  ],
+  '401': [
+    { q: 'Safety management systems (SMS) are based on which key principle?', opts: ['Reactive management after accidents','Proactive identification and management of hazards and risks','Cost reduction only','Regulatory compliance alone'], ans: 'B' },
+    { q: 'ISO 45001 is the international standard for:', opts: ['Environmental management','Occupational Health and Safety Management Systems','Quality management','Food safety'], ans: 'B' },
+    { q: 'A safety management system (SMS) consists of:', opts: ['Policy, Organizing, Planning, Measuring, Reviewing (POPMAR framework)','PPE, training, audits only','Accident reports and first aid only','Only management policies'], ans: 'A' },
+    { q: 'Which tool is used to systematically identify all possible failures in a system?', opts: ['Job Safety Analysis','Hazard and Operability Study (HAZOP)','Triage system','Safety data sheet'], ans: 'B' },
+    { q: 'The Plan-Do-Check-Act (PDCA) cycle in safety management is used for:', opts: ['Financial planning','Continuous improvement of the safety management system','Equipment procurement','Staff appraisal'], ans: 'B' },
+    { q: 'Leading indicators in safety management are:', opts: ['Accident rates and injury statistics','Proactive measures such as training completion, inspections, near-miss reporting','Financial expenditures on safety','Number of disciplinary actions'], ans: 'B' },
+    { q: 'An occupational health program addresses:', opts: ['Only workplace injuries','The physical and mental wellbeing of workers in relation to their work','Equipment maintenance only','Environmental pollution exclusively'], ans: 'B' },
+    { q: 'The purpose of a safety culture survey is to:', opts: ['Evaluate workers\' job performance','Assess the prevailing attitudes and behaviors regarding safety in the organization','Set salary scales','Determine accident frequency only'], ans: 'B' },
+    { q: 'Which legislation governs workplace safety in Nigeria?', opts: ['Companies and Allied Matters Act (CAMA)','Factories Act (and its 2004 revision) and the Employee Compensation Act','Immigration Act','Petroleum Act exclusively'], ans: 'B' },
+    { q: 'Management commitment to safety is critical because:', opts: ['It fulfills a legal formality','It sets the tone for safety culture and resource allocation','It only affects senior staff','It replaces the need for worker training'], ans: 'B' },
+    { q: 'Worker participation in safety is important because:', opts: ['Workers can replace safety officers','Workers have firsthand knowledge of hazards and risks in their tasks','It reduces the cost of PPE','It reduces the number of regulations'], ans: 'B' },
+    { q: 'A safety management plan should be:', opts: ['A general document with no specific actions','A documented, actionable plan with responsible persons, timelines, and measurable targets','Only verbal agreements','A list of penalties for unsafe behavior'], ans: 'B' },
+    { q: 'Emergency preparedness in safety management includes:', opts: ['Only fire drills','Identifying potential emergencies, planning responses, training, and exercising plans','Purchasing fire extinguishers only','Informing management only'], ans: 'B' },
+    { q: 'Contractor management in safety ensures:', opts: ['Contractors are not responsible for safety','Contractors comply with the same safety standards as permanent employees','Only in-house staff safety matters','Contractors manage their own safety independently'], ans: 'B' },
+    { q: 'A lagging indicator example in safety is:', opts: ['Number of safety training sessions conducted','Lost Time Injury Rate (LTIR)','Number of hazard reports submitted','Safety inspections completed'], ans: 'B' },
+    { q: 'Root cause analysis (RCA) in accident investigation aims to:', opts: ['Blame the injured worker','Identify the underlying causes to prevent recurrence','Document the accident for insurance','Determine compensation amounts'], ans: 'B' },
+    { q: 'ALARP stands for:', opts: ['Always Liable, Always Responsible, Prevent','As Low As Reasonably Practicable','Avoid Loss, Avoid Risk Penalties','All Levels of Accident Risk Prevention'], ans: 'B' },
+    { q: 'Health and Safety audits should be conducted by:', opts: ['Only internal staff to save cost','Competent persons who can objectively evaluate the SMS, internal or external','Only external consultants','Senior management exclusively'], ans: 'B' },
+    { q: 'Toolbox talks contribute to safety management by:', opts: ['Replacing formal safety training','Providing short, frequent, task-specific safety reminders and discussions','Documenting all accidents','Managing emergency responses'], ans: 'B' },
+    { q: 'The five steps of risk assessment are:', opts: ['Identify, Analyze, Control, Evaluate, Report','Identify hazards, decide who might be harmed, evaluate risks, record findings, review','Plan, Train, Inspect, Analyze, Close','Observe, Report, Measure, Rate, Control'], ans: 'B' },
+  ],
+  '402': [
+    { q: 'Emergency management is best described as:', opts: ['Response activities only after an emergency','The comprehensive approach to managing all phases of emergencies to minimize their impact','A one-time event coordination','Law enforcement activities during crises'], ans: 'B' },
+    { q: 'The four phases of emergency management are:', opts: ['Prevention, Response, Recovery, Evaluation','Mitigation, Preparedness, Response, Recovery','Planning, Training, Response, Rebuilding','Identify, Assess, Control, Review'], ans: 'B' },
+    { q: 'A Comprehensive Emergency Management Plan (CEMP) contains:', opts: ['Only evacuation procedures','All hazards information, roles and responsibilities, annexes for specific hazards','Financial budgets only','Media communication guidelines only'], ans: 'B' },
+    { q: 'The Emergency Operations Center (EOC) is activated to:', opts: ['Serve as a field command post','Coordinate information, resources, and decisions at a strategic level during an emergency','Provide medical care to casualties','Train emergency responders'], ans: 'B' },
+    { q: 'A Situation Report (SITREP) in emergency management provides:', opts: ['Historical background of the agency','Current status of an emergency including actions taken, resources, and needs','Future planning documents','Staff performance reviews'], ans: 'B' },
+    { q: 'Public information management during emergencies is important to:', opts: ['Control the media','Provide accurate, timely, and consistent information to the public to support protective actions','Increase agency visibility','Limit public knowledge'], ans: 'B' },
+    { q: 'The National Emergency Management Agency (NEMA) in Nigeria was established under:', opts: ['The Factories Act','NEMA Establishment Act (Decree 12 of 1999)','The Constitution only','The Police Act'], ans: 'B' },
+    { q: 'Mutual aid agreements in emergency management ensure:', opts: ['Only financial transactions between agencies','Agencies can request and receive assistance from each other during large-scale emergencies','Agencies compete for resources','Media access is controlled'], ans: 'B' },
+    { q: 'Continuity of operations planning (COOP) ensures:', opts: ['New staff are hired during emergencies','Essential functions of an organization continue during and after a disruption','Only IT systems are maintained','Physical structures are preserved only'], ans: 'B' },
+    { q: 'A critical infrastructure in emergency management refers to:', opts: ['All government buildings','Systems and assets essential to national security, health, safety, and economic stability','Only military installations','Tourism facilities'], ans: 'B' },
+    { q: 'Damage assessment after an emergency is conducted to:', opts: ['Assign blame for the emergency','Determine the extent of damage and inform recovery planning and resource requests','Satisfy legal requirements only','Make insurance claims only'], ans: 'B' },
+    { q: 'Vulnerable populations in emergency management include:', opts: ['Only children under 5','Elderly, disabled, low-income, language-barrier populations, and others who may need special assistance','Only physically disabled persons','Only foreign nationals'], ans: 'B' },
+    { q: 'The National Response Framework (NRF) describes:', opts: ['Only physical response operations','Key principles, roles, and structures to guide national response to disasters and emergencies','Financial management only','Media relations policy'], ans: 'B' },
+    { q: 'Resource management in an EOC involves:', opts: ['Ordering supplies only','Tracking, requesting, deploying, and demobilizing resources throughout the incident','Only financial accounting','Staffing decisions'], ans: 'B' },
+    { q: 'The Stafford Act in the U.S. context relates to:', opts: ['Trade agreements','Federal disaster assistance framework — used as an international reference for emergency legislation','Immigration law','Environmental protection'], ans: 'B' },
+    { q: 'Demobilization in emergency management means:', opts: ['Abandoning the incident','The orderly and systematic release of resources when no longer needed','Closing the EOC permanently','Transferring command to police'], ans: 'B' },
+    { q: 'The Incident Action Plan (IAP) includes:', opts: ['Only financial records','Objectives, strategies, tactics, and assignments for a specific operational period','Background information only','Staff leave schedules'], ans: 'B' },
+    { q: 'Long-term recovery from a major emergency may take:', opts: ['A few hours','Days to months to years, depending on the scale','Exactly 30 days','Never exceeds one week'], ans: 'B' },
+    { q: 'The Build Back Better approach in recovery emphasizes:', opts: ['Restoring exactly what existed before','Improving systems, infrastructure, and practices to reduce future vulnerability','Rapid rebuilding at any cost','Focusing only on physical infrastructure'], ans: 'B' },
+    { q: 'Liaison officers in emergency management serve to:', opts: ['Control media access','Facilitate communication and coordination between different agencies or organizations','Manage financial resources','Lead field rescue operations'], ans: 'B' },
+  ],
+  '403': [
+    { q: 'Crisis de-escalation is best defined as:', opts: ['Using force to subdue an agitated person','Using communication techniques to reduce the intensity of a conflict or crisis situation','Ignoring the person until they calm down','Physically restraining a person in distress'], ans: 'B' },
+    { q: 'Active listening in de-escalation involves:', opts: ['Interrupting frequently to provide solutions','Giving full attention, acknowledging feelings, and seeking to understand the person','Pretending to listen while planning next steps','Listening only to factual content, not emotions'], ans: 'B' },
+    { q: 'Non-verbal communication in de-escalation includes:', opts: ['Words spoken only','Body language, tone of voice, eye contact, and physical distance','Written messages','Only hand gestures'], ans: 'B' },
+    { q: 'When approaching an agitated person, the recommended body positioning is:', opts: ['Standing directly face-to-face to demonstrate authority','Standing slightly to the side, at a safe distance, with open posture','Standing behind the person','Crouching very low'], ans: 'B' },
+    { q: 'Empathy in crisis de-escalation means:', opts: ['Agreeing with everything the person says','Understanding and acknowledging the person\'s feelings without necessarily agreeing with their actions','Showing pity','Avoiding discussion of feelings'], ans: 'B' },
+    { q: 'In mental health crisis response, the acronym ALGEE stands for:', opts: ['Assess risk, Listen, Give reassurance, Encourage professional help, Encourage self-help','Alert, Locate, Guide, Engage, Evacuate','Analyze, Lead, Guide, Evaluate, Exit','Assist, Listen, Ground, Empower, Evacuate'], ans: 'A' },
+    { q: 'What is the primary goal in crisis de-escalation?', opts: ['Winning the argument','Ensuring the safety of all parties and connecting the person to appropriate support','Demonstrating authority','Documenting the incident'], ans: 'B' },
+    { q: 'Escalation of a crisis situation may be triggered by:', opts: ['Calm, respectful communication','Confrontational tone, physical proximity, sudden movements, or feeling disrespected','Offering choices to the person','Using the person\'s name'], ans: 'B' },
+    { q: 'When is it appropriate to involve law enforcement in a crisis?', opts: ['Immediately in all situations','When there is imminent risk of violence or the safety of others cannot be maintained','Only after exhausting all verbal techniques','Never in a mental health crisis'], ans: 'B' },
+    { q: 'Trauma-informed care in crisis response recognizes:', opts: ['Past trauma is irrelevant to current crisis','Many people in crisis have a history of trauma, and this should inform how responders engage with them','Crisis is never related to past experiences','Only physical trauma matters'], ans: 'B' },
+    { q: 'Which phrase is most effective when trying to de-escalate a person in crisis?', opts: ['"Calm down right now!"','"I can see you are upset. Can you tell me what is happening?"','"You are being irrational."','"If you don\'t stop, I will call the police."'], ans: 'B' },
+    { q: 'Using excessive jargon or complex language during de-escalation:', opts: ['Demonstrates professionalism','Can confuse and further agitate the person in crisis','Is recommended for mental health crises','Has no effect on outcome'], ans: 'B' },
+    { q: 'Giving a person in crisis limited choices (e.g., "Would you like to sit here or there?") works because:', opts: ['It confuses them','It restores a sense of control and reduces feelings of powerlessness','It is a physical restraint technique','It is used only in psychiatric settings'], ans: 'B' },
+    { q: 'Self-care for crisis responders is important because:', opts: ['It is a luxury only','Repeated exposure to traumatic situations can lead to compassion fatigue, burnout, and secondary trauma','It improves physical fitness only','Supervisors require it'], ans: 'B' },
+    { q: 'During a hostage or barricade situation, initial responders should:', opts: ['Attempt to enter and resolve the situation immediately','Contain the situation, establish communication, avoid escalation, and wait for trained negotiators','Use force immediately','Do nothing'], ans: 'B' },
+    { q: 'Suicide risk assessment in crisis response typically evaluates:', opts: ['The person\'s financial status','Ideation, plan, means, and intent','Physical health only','Work history'], ans: 'B' },
+    { q: 'The concept of "psychological first aid" focuses on:', opts: ['Administering psychiatric medication','Stabilizing immediate distress, promoting safety, and connecting people to support','Conducting detailed mental health assessments','Documenting injuries'], ans: 'B' },
+    { q: 'Reflective statements in de-escalation (e.g., "It sounds like you are feeling overwhelmed") are used to:', opts: ['Change the subject','Show understanding and encourage the person to continue sharing','Diagnose mental illness','Document the conversation'], ans: 'B' },
+    { q: 'De-escalation is most effective when the responder:', opts: ['Is visibly stressed and urgent','Is calm, confident, and genuinely focused on the person\'s wellbeing','Uses technical language','Rushes the interaction to resolve it quickly'], ans: 'B' },
+    { q: 'Post-incident support for individuals who experienced a crisis should include:', opts: ['Only a written report','Follow-up, referral to mental health services, and psychosocial support as needed','No action if no physical injury occurred','Immediate return to normal activities'], ans: 'B' },
+  ],
+};
+
+let state = {
+  settings: { duration: 60, passmark: 50, qCount: 20 },
+  results: [],
+  takenExams: {}, // key: matric+courseCode => true
+  currentExam: null,
+  currentStudent: null,
+  students: [],
+  adminLoggedIn: false,
+  adminPass: 'ntscra2024',
+  questions: { ...DEFAULT_QUESTIONS },
+};
+
+// Load from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem('ntscra_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state.settings = parsed.settings || state.settings;
+      state.results = parsed.results || [];
+      state.takenExams = parsed.takenExams || {};
+      state.adminPass = parsed.adminPass || state.adminPass;
+      state.questions = parsed.questions || state.questions;
+    }
+  } catch(e) {}
+}
+function saveState() {
+  try {
+    localStorage.setItem('ntscra_state', JSON.stringify({
+      settings: state.settings,
+      results: state.results,
+      takenExams: state.takenExams,
+      adminPass: state.adminPass,
+      questions: state.questions,
+    }));
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('admin-login-page').style.display = 'none';
+  // Update nav
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (id === 'courses') document.querySelectorAll('.nav-btn')[1].classList.add('active');
+  if (id === 'home') document.querySelectorAll('.nav-btn')[0].classList.add('active');
+  if (id === 'admin') document.querySelectorAll('.nav-btn')[2].classList.add('active');
+  if (id === 'courses') renderCourses();
+  if (id === 'admin') renderAdmin();
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════
+// COURSES RENDER
+// ═══════════════════════════════════════════════
+function renderCourses() {
+  const grid = document.getElementById('courses-grid');
+  grid.innerHTML = '';
+  COURSES.forEach(course => {
+    const card = document.createElement('div');
+    card.className = 'course-card';
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-icon">${course.icon}</div>
+        <span class="card-status">Active</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${course.title}</div>
+        <div class="card-desc">${course.desc}</div>
+        <div class="card-meta">
+          <span>⏱ ${state.settings.duration} min</span>
+          <span>📝 ${course.modules.length} modules</span>
+          <span>🎯 ${state.settings.passmark}% pass</span>
+        </div>
+        <button class="dropdown-toggle" onclick="toggleDropdown(this, '${course.id}')">
+          <span>Select Exam Module</span>
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" id="dd-${course.id}">
+          ${course.modules.map(mod => {
+            const key = `${mod.code}`;
+            const studentsTaken = state.results.filter(r => r.courseCode === mod.code).length;
+            return `<div class="dropdown-item">
+              <span class="dropdown-item-code">${mod.code}</span>
+              <span class="dropdown-item-name">${mod.name}</span>
+              <button class="start-btn" onclick="openRegister('${mod.code}', '${mod.name}', event)">Start →</button>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function toggleDropdown(btn, courseId) {
+  const menu = document.getElementById('dd-' + courseId);
+  const arrow = btn.querySelector('.dropdown-arrow');
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.dropdown-menu').forEach(m => { m.classList.remove('open'); });
+  document.querySelectorAll('.dropdown-arrow').forEach(a => { a.classList.remove('open'); });
+  if (!isOpen) { menu.classList.add('open'); arrow.classList.add('open'); }
+}
+
+// ═══════════════════════════════════════════════
+// REGISTRATION MODAL
+// ═══════════════════════════════════════════════
+let pendingExam = null;
+function openRegister(code, name, event) {
+  event.stopPropagation();
+  pendingExam = { code, name };
+  document.getElementById('reg-exam-name').textContent = `${code} — ${name}`;
+  document.getElementById('reg-duration').textContent = `${state.settings.duration} minutes`;
+  document.getElementById('reg-error').style.display = 'none';
+  const fields = ['reg-firstname','reg-lastname','reg-matric','reg-email'];
+  if (state.currentStudent) {
+    document.getElementById('reg-firstname').value = state.currentStudent.firstName;
+    document.getElementById('reg-lastname').value = state.currentStudent.lastName;
+    document.getElementById('reg-matric').value = state.currentStudent.matric;
+    document.getElementById('reg-email').value = state.currentStudent.email;
+    fields.forEach(id => { document.getElementById(id).readOnly = true; document.getElementById(id).style.opacity = '0.7'; });
+  } else {
+    fields.forEach(id => { document.getElementById(id).value = ''; document.getElementById(id).readOnly = false; document.getElementById(id).style.opacity = ''; });
+  }
+  document.getElementById('modal-register').classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function startExam() {
+  const fn = document.getElementById('reg-firstname').value.trim();
+  const ln = document.getElementById('reg-lastname').value.trim();
+  const matric = document.getElementById('reg-matric').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const errEl = document.getElementById('reg-error');
+  if (!fn || !ln || !matric || !email) {
+    errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return;
+  }
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    errEl.textContent = 'Please enter a valid email.'; errEl.style.display = 'block'; return;
+  }
+  const attemptKey = `${matric.toLowerCase()}_${pendingExam.code}`;
+  if (state.takenExams[attemptKey]) {
+    errEl.textContent = `You have already completed exam ${pendingExam.code}. Each exam can only be taken once.`;
+    errEl.style.display = 'block'; return;
+  }
+  closeModal('modal-register');
+  launchExam({ code: pendingExam.code, name: pendingExam.name, firstName: fn, lastName: ln, matric, email });
+}
+
+// ═══════════════════════════════════════════════
+// EXAM ENGINE
+// ═══════════════════════════════════════════════
+let timerInterval = null;
+let examSecondsLeft = 0;
+let examStartTime = null;
+
+function launchExam(info) {
+  const allQs = state.questions[info.code] || DEFAULT_QUESTIONS[info.code] || [];
+  const qCount = Math.min(state.settings.qCount, allQs.length);
+  const shuffled = [...allQs].sort(() => Math.random() - 0.5).slice(0, qCount);
+
+  state.currentExam = {
+    info,
+    questions: shuffled,
+    answers: Array(shuffled.length).fill(null),
+    flagged: Array(shuffled.length).fill(false),
+    currentIdx: 0,
+  };
+  examSecondsLeft = state.settings.duration * 60;
+  examStartTime = Date.now();
+
+  document.getElementById('exam-code-display').textContent = info.code;
+  document.getElementById('exam-name-display').textContent = info.name;
+  showPage('exam');
+  renderQuestion();
+  renderQNav();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(tickTimer, 1000);
+}
+
+function tickTimer() {
+  examSecondsLeft--;
+  const m = Math.floor(examSecondsLeft / 60).toString().padStart(2, '0');
+  const s = (examSecondsLeft % 60).toString().padStart(2, '0');
+  const display = document.getElementById('timer-display');
+  display.textContent = `${m}:${s}`;
+  display.classList.remove('warning', 'danger');
+  if (examSecondsLeft <= 300 && examSecondsLeft > 60) display.classList.add('warning');
+  if (examSecondsLeft <= 60) display.classList.add('danger');
+  if (examSecondsLeft <= 0) { clearInterval(timerInterval); submitExam(); }
+}
+
+function renderQuestion() {
+  const ex = state.currentExam;
+  const q = ex.questions[ex.currentIdx];
+  const n = ex.currentIdx;
+  document.getElementById('q-number-display').textContent = `Question ${n + 1} of ${ex.questions.length}`;
+  document.getElementById('q-text').textContent = q.q;
+  const optList = document.getElementById('options-list');
+  optList.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (ex.answers[n] === letters[i] ? ' selected' : '');
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(letters[i]);
+    optList.appendChild(btn);
+  });
+  const pct = ((n + 1) / ex.questions.length) * 100;
+  document.getElementById('exam-progress').style.width = pct + '%';
+  document.getElementById('btn-prev').disabled = n === 0;
+  document.getElementById('btn-next').disabled = n === ex.questions.length - 1;
+  const flagBtn = document.getElementById('btn-flag');
+  flagBtn.textContent = ex.flagged[n] ? '🚩 Unflag' : '🚩 Flag';
+  updateSidebarCount();
+}
+
+function selectAnswer(letter) {
+  const ex = state.currentExam;
+  ex.answers[ex.currentIdx] = letter;
+  renderQuestion();
+  renderQNav();
+}
+
+function navigate(dir) {
+  const ex = state.currentExam;
+  ex.currentIdx = Math.max(0, Math.min(ex.questions.length - 1, ex.currentIdx + dir));
+  renderQuestion();
+}
+
+function toggleFlag() {
+  const ex = state.currentExam;
+  ex.flagged[ex.currentIdx] = !ex.flagged[ex.currentIdx];
+  renderQuestion();
+  renderQNav();
+}
+
+function renderQNav() {
+  const ex = state.currentExam;
+  const nav = document.getElementById('q-nav');
+  nav.innerHTML = '';
+  ex.questions.forEach((_, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-nav-btn';
+    if (i === ex.currentIdx) btn.classList.add('current');
+    else if (ex.flagged[i]) btn.classList.add('flagged');
+    else if (ex.answers[i]) btn.classList.add('answered');
+    btn.textContent = i + 1;
+    btn.onclick = () => { ex.currentIdx = i; renderQuestion(); renderQNav(); };
+    nav.appendChild(btn);
+  });
+}
+
+function updateSidebarCount() {
+  const ex = state.currentExam;
+  const answered = ex.answers.filter(Boolean).length;
+  document.getElementById('sidebar-answered').textContent = `${answered} / ${ex.questions.length} answered`;
+}
+
+function confirmSubmit() {
+  const ex = state.currentExam;
+  const unanswered = ex.answers.filter(a => !a).length;
+  const warn = document.getElementById('unanswered-warn');
+  warn.textContent = unanswered > 0 ? `⚠ You have ${unanswered} unanswered question${unanswered > 1 ? 's' : ''}.` : '';
+  document.getElementById('modal-confirm-submit').classList.add('active');
+}
+
+function submitExam() {
+  clearInterval(timerInterval);
+  closeModal('modal-confirm-submit');
+  const ex = state.currentExam;
+  const timeTaken = Math.round((Date.now() - examStartTime) / 1000);
+  let correct = 0;
+  ex.questions.forEach((q, i) => { if (ex.answers[i] === q.ans) correct++; });
+  const total = ex.questions.length;
+  const score = Math.round((correct / total) * 100);
+  const pass = score >= state.settings.passmark;
+
+  const record = {
+    id: Date.now(),
+    firstName: ex.info.firstName,
+    lastName: ex.info.lastName,
+    fullName: `${ex.info.firstName} ${ex.info.lastName}`,
+    matric: ex.info.matric,
+    email: ex.info.email,
+    courseCode: ex.info.code,
+    courseName: ex.info.name,
+    score,
+    correct,
+    wrong: total - correct - ex.answers.filter(a => !a).length,
+    unanswered: ex.answers.filter(a => !a).length,
+    total,
+    status: pass ? 'Pass' : 'Fail',
+    timeTaken,
+    date: new Date().toISOString(),
+  };
+  state.results.unshift(record);
+  const attemptKey = `${ex.info.matric.toLowerCase()}_${ex.info.code}`;
+  state.takenExams[attemptKey] = true;
+  saveState();
+
+  // Show result
+  document.getElementById('result-score').textContent = score + '%';
+  document.getElementById('result-icon').textContent = pass ? '🏆' : '📚';
+  document.getElementById('result-icon').className = 'result-icon ' + (pass ? 'pass' : 'fail');
+  document.getElementById('result-verdict').textContent = pass ? 'PASS — Congratulations!' : 'FAIL — Not Passed';
+  document.getElementById('result-verdict').className = 'result-verdict ' + (pass ? 'pass' : 'fail');
+  document.getElementById('res-correct').textContent = correct;
+  document.getElementById('res-wrong').textContent = record.wrong;
+  document.getElementById('res-unanswered').textContent = record.unanswered;
+  const mins = Math.floor(timeTaken / 60), secs = timeTaken % 60;
+  document.getElementById('result-note').innerHTML = `
+    <strong>Student:</strong> ${record.fullName} &nbsp;|&nbsp; <strong>Matric:</strong> ${record.matric}<br>
+    <strong>Module:</strong> ${ex.info.code} — ${ex.info.name}<br>
+    <strong>Time used:</strong> ${mins}m ${secs}s &nbsp;|&nbsp; <strong>Date:</strong> ${new Date().toLocaleDateString('en-NG', {day:'numeric',month:'long',year:'numeric'})}<br>
+    ${pass ? '✅ This result has been recorded. You may collect your certificate from the registrar.' : '❌ You did not meet the pass mark. Contact your instructor for guidance.'}
+  `;
+  showPage('result');
+}
+
+// ═══════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════
+function showAdminLogin() {
+  if (state.adminLoggedIn) { showPage('admin'); return; }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('admin-login-page').style.display = 'flex';
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('admin-user').value = '';
+  document.getElementById('admin-pass').value = '';
+}
+
+function doAdminLogin() {
+  const u = document.getElementById('admin-user').value.trim();
+  const p = document.getElementById('admin-pass').value;
+  if (u === 'admin' && p === state.adminPass) {
+    state.adminLoggedIn = true;
+    document.getElementById('admin-login-page').style.display = 'none';
+    showPage('admin');
+  } else {
+    document.getElementById('login-error').textContent = 'Invalid username or password.';
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function adminLogout() {
+  state.adminLoggedIn = false;
+  showPage('home');
+}
+
+function adminNav(section) {
+  document.querySelectorAll('.admin-nav-item').forEach((el, i) => {
+    const sections = ['dashboard','results','students','questions','settings'];
+    el.classList.toggle('active', sections[i] === section);
+  });
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('admin-' + section).classList.add('active');
+  if (section === 'dashboard') renderDashboard();
+  if (section === 'results') renderResults();
+  if (section === 'students') renderStudents();
+  if (section === 'questions') renderQManagement();
+  if (section === 'settings') loadSettings();
+}
+
+function renderAdmin() {
+  renderDashboard();
+  populateCourseFilters();
+}
+
+function renderDashboard() {
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-NG', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const total = state.results.length;
+  const passed = state.results.filter(r => r.status === 'Pass').length;
+  const failed = total - passed;
+  const avgScore = total ? Math.round(state.results.reduce((s, r) => s + r.score, 0) / total) : 0;
+  const uniqueStudents = (state.students && state.students.length) ? state.students.length : new Set(state.results.map(r => r.matric)).size;
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${total}</div><div class="stat-lbl">Total Exams Taken</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#4ade80">${passed}</div><div class="stat-lbl">Passed</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#f87171">${failed}</div><div class="stat-lbl">Failed</div></div>
+    <div class="stat-card"><div class="stat-val">${avgScore}%</div><div class="stat-lbl">Avg Score</div></div>
+    <div class="stat-card"><div class="stat-val">${uniqueStudents}</div><div class="stat-lbl">Students</div></div>
+  `;
+  const tbody = document.getElementById('recent-tbody');
+  const recent = state.results.slice(0, 10);
+  tbody.innerHTML = recent.length ? recent.map(r => `
+    <tr>
+      <td>${r.fullName}</td>
+      <td>${r.courseCode} — ${r.courseName}</td>
+      <td style="font-family:'DM Mono',monospace">${r.score}%</td>
+      <td><span class="badge badge-${r.status.toLowerCase()}">${r.status}</span></td>
+      <td style="font-size:12px;color:var(--muted)">${new Date(r.date).toLocaleDateString('en-NG')}</td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted)">No results yet.</td></tr>';
+}
+
+function renderResults() {
+  const tbody = document.getElementById('results-tbody');
+  const search = document.getElementById('results-search').value.toLowerCase();
+  const courseFilter = document.getElementById('filter-course').value;
+  const statusFilter = document.getElementById('filter-status').value;
+  let filtered = state.results.filter(r => {
+    const matchSearch = !search || r.fullName.toLowerCase().includes(search) || r.matric.toLowerCase().includes(search) || r.courseCode.toLowerCase().includes(search) || r.courseName.toLowerCase().includes(search);
+    const matchCourse = !courseFilter || r.courseCode === courseFilter;
+    const matchStatus = !statusFilter || r.status === statusFilter;
+    return matchSearch && matchCourse && matchStatus;
+  });
+  tbody.innerHTML = filtered.length ? filtered.map((r, i) => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;color:var(--muted)">${i + 1}</td>
+      <td>${r.fullName}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${r.matric}</td>
+      <td style="font-family:'DM Mono',monospace">${r.courseCode}</td>
+      <td>${r.courseName}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:600">${r.score}%</td>
+      <td><span class="badge badge-${r.status.toLowerCase()}">${r.status}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${formatTime(r.timeTaken)}</td>
+      <td style="font-size:12px;color:var(--muted)">${new Date(r.date).toLocaleString('en-NG')}</td>
+    </tr>`).join('') : '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted)">No results found.</td></tr>';
+}
+
+function formatTime(secs) {
+  const m = Math.floor(secs / 60), s = secs % 60;
+  return `${m}m ${s}s`;
+}
+
+function filterResults() { renderResults(); }
+
+function populateCourseFilters() {
+  const sel = document.getElementById('filter-course');
+  const qSel = document.getElementById('q-course-filter');
+  const allMods = COURSES.flatMap(c => c.modules);
+  const opts = allMods.map(m => `<option value="${m.code}">${m.code} — ${m.name}</option>`).join('');
+  if (sel) sel.innerHTML = '<option value="">All Courses</option>' + opts;
+  if (qSel) qSel.innerHTML = '<option value="">Select Course Module</option>' + opts;
+}
+
+function renderStudents() {
+  const tbody = document.getElementById('students-tbody');
+  const search = document.getElementById('students-search').value.toLowerCase();
+
+  // Build exam-result map keyed by matric
+  const resultMap = {};
+  state.results.forEach(r => {
+    if (!resultMap[r.matric]) resultMap[r.matric] = { email: r.email, exams: [] };
+    resultMap[r.matric].exams.push(r);
+  });
+
+  // Build rows from enrolled students list
+  const enrolledMatrics = new Set();
+  let rows = [];
+  (state.students || []).forEach(s => {
+    enrolledMatrics.add(s.matric);
+    const rd = resultMap[s.matric];
+    const exams = rd ? rd.exams.length : 0;
+    const avgScore = rd ? Math.round(rd.exams.reduce((a, e) => a + e.score, 0) / rd.exams.length) : null;
+    rows.push({ fullName: s.fullName, matric: s.matric, email: s.email, phone: s.phone || '—', exams, avgScore, enrolledAt: s.enrolledAt, isEnrolled: true });
+  });
+
+  // Add legacy students (have results but not enrolled via new system)
+  Object.entries(resultMap).forEach(([matric, rd]) => {
+    if (!enrolledMatrics.has(matric)) {
+      const r0 = rd.exams[0];
+      const avgScore = Math.round(rd.exams.reduce((a, e) => a + e.score, 0) / rd.exams.length);
+      rows.push({ fullName: r0.fullName, matric, email: r0.email || '—', phone: '—', exams: rd.exams.length, avgScore, enrolledAt: null, isEnrolled: false });
+    }
+  });
+
+  // Filter by search
+  if (search) rows = rows.filter(s =>
+    s.fullName.toLowerCase().includes(search) || s.matric.toLowerCase().includes(search) || s.email.toLowerCase().includes(search)
+  );
+
+  tbody.innerHTML = rows.length ? rows.map(s => {
+    const avgDisplay = s.avgScore !== null ? `${s.avgScore}%` : '—';
+    const enrolledDisplay = s.enrolledAt ? new Date(s.enrolledAt).toLocaleDateString('en-NG') : '—';
+    const statusBadge = s.isEnrolled
+      ? `<span class="badge badge-pass">Enrolled</span>`
+      : `<span class="badge" style="background:rgba(255,255,255,0.08);color:var(--muted)">Legacy</span>`;
+    return `<tr>
+      <td>${s.fullName}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${s.matric}</td>
+      <td style="font-size:12px">${s.email}</td>
+      <td style="font-size:12px">${s.phone}</td>
+      <td>${statusBadge}</td>
+      <td style="font-family:'DM Mono',monospace">${s.exams}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:600">${avgDisplay}</td>
+      <td style="font-size:12px;color:var(--muted)">${enrolledDisplay}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">No students found.</td></tr>';
+}
+
+function filterStudents() { renderStudents(); }
+
+// ─── EXPORT CSV ───
+function exportCSV() {
+  if (!state.results.length) { alert('No results to export.'); return; }
+  const headers = ['#','Full Name','Matric No','Email','Course Code','Course Name','Score (%)','Correct','Wrong','Unanswered','Total Questions','Status','Time Taken','Date & Time'];
+  const rows = state.results.map((r, i) => [
+    i + 1, r.fullName, r.matric, r.email, r.courseCode, r.courseName,
+    r.score, r.correct, r.wrong, r.unanswered, r.total,
+    r.status, formatTime(r.timeTaken), new Date(r.date).toLocaleString('en-NG')
+  ]);
+  const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `NTSCRA_Exam_Results_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── CLEAR RESULTS / STUDENTS ───
+let clearAction = null;
+function confirmClearResults() {
+  document.getElementById('clear-title').textContent = 'Clear All Results?';
+  document.getElementById('clear-msg').textContent = 'This will permanently delete all exam results. This action cannot be undone.';
+  clearAction = 'results';
+  document.getElementById('clear-confirm-btn').onclick = executeClear;
+  document.getElementById('modal-confirm-clear').classList.add('active');
+}
+function confirmClearStudents() {
+  document.getElementById('clear-title').textContent = 'Reset All Exam Attempts?';
+  document.getElementById('clear-msg').textContent = 'This will allow all students to retake exams. Result records will be kept.';
+  clearAction = 'students';
+  document.getElementById('clear-confirm-btn').onclick = executeClear;
+  document.getElementById('modal-confirm-clear').classList.add('active');
+}
+function confirmDeleteStudents() {
+  document.getElementById('clear-title').textContent = 'Delete All Enrolled Students?';
+  document.getElementById('clear-msg').textContent = 'This will permanently delete all enrollment records. Students will not be able to login until they re-enroll. This action cannot be undone.';
+  clearAction = 'delete-students';
+  document.getElementById('clear-confirm-btn').onclick = executeClear;
+  document.getElementById('modal-confirm-clear').classList.add('active');
+}
+function executeClear() {
+  if (clearAction === 'results') { state.results = []; state.takenExams = {}; }
+  if (clearAction === 'students') { state.takenExams = {}; }
+  if (clearAction === 'delete-students') { state.students = []; saveStudents(); }
+  saveState();
+  closeModal('modal-confirm-clear');
+  adminNav(clearAction === 'results' ? 'results' : 'students');
+}
+
+// ─── QUESTIONS ───
+function renderQManagement() {
+  populateCourseFilters();
+  document.getElementById('add-q-form').style.display = 'none';
+  loadQuestions();
+}
+
+function loadQuestions() {
+  const code = document.getElementById('q-course-filter').value;
+  const list = document.getElementById('q-list');
+  if (!code) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">❓</div><p>Select a module above to view questions.</p></div>'; return; }
+  const qs = (state.questions[code] || DEFAULT_QUESTIONS[code] || []);
+  if (!qs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No questions for this module yet.</p></div>'; return; }
+  list.innerHTML = qs.map((q, i) => `
+    <div class="q-item">
+      <div class="q-item-header">
+        <span class="q-item-text"><strong>Q${i+1}.</strong> ${q.q}</span>
+        <span class="q-item-meta">Ans: ${q.ans}</span>
+        <button class="q-item-delete" onclick="deleteQuestion('${code}', ${i})" title="Delete">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function showAddQuestion() {
+  const code = document.getElementById('q-course-filter').value;
+  if (!code) { alert('Please select a course module first.'); return; }
+  const form = document.getElementById('add-q-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  ['q-text-input','opt-a','opt-b','opt-c','opt-d'].forEach(id => document.getElementById(id).value = '');
+}
+
+function saveQuestion() {
+  const code = document.getElementById('q-course-filter').value;
+  const text = document.getElementById('q-text-input').value.trim();
+  const a = document.getElementById('opt-a').value.trim();
+  const b = document.getElementById('opt-b').value.trim();
+  const c = document.getElementById('opt-c').value.trim();
+  const d = document.getElementById('opt-d').value.trim();
+  const ans = document.getElementById('correct-ans').value;
+  if (!text || !a || !b || !c || !d) { alert('Fill in all question fields.'); return; }
+  if (!state.questions[code]) state.questions[code] = [...(DEFAULT_QUESTIONS[code] || [])];
+  state.questions[code].push({ q: text, opts: [a, b, c, d], ans });
+  saveState();
+  document.getElementById('add-q-form').style.display = 'none';
+  loadQuestions();
+}
+
+function deleteQuestion(code, idx) {
+  if (!confirm('Delete this question?')) return;
+  if (!state.questions[code]) state.questions[code] = [...(DEFAULT_QUESTIONS[code] || [])];
+  state.questions[code].splice(idx, 1);
+  saveState();
+  loadQuestions();
+}
+
+// ─── SETTINGS ───
+function loadSettings() {
+  document.getElementById('set-duration').value = state.settings.duration;
+  document.getElementById('set-passmark').value = state.settings.passmark;
+  document.getElementById('set-qcount').value = state.settings.qCount;
+  document.getElementById('set-newpass').value = '';
+}
+
+function saveSettings() {
+  const dur = parseInt(document.getElementById('set-duration').value);
+  const pm = parseInt(document.getElementById('set-passmark').value);
+  const qc = parseInt(document.getElementById('set-qcount').value);
+  const np = document.getElementById('set-newpass').value;
+  if (!dur || dur < 5 || dur > 180) { showSettingsAlert('Duration must be between 5 and 180 minutes.', 'error'); return; }
+  if (pm < 0 || pm > 100) { showSettingsAlert('Pass mark must be between 0 and 100.', 'error'); return; }
+  if (qc < 5 || qc > 50) { showSettingsAlert('Questions per exam must be between 5 and 50.', 'error'); return; }
+  state.settings = { duration: dur, passmark: pm, qCount: qc };
+  if (np) state.adminPass = np;
+  saveState();
+  showSettingsAlert('Settings saved successfully!', 'success');
+}
+
+function showSettingsAlert(msg, type) {
+  const el = document.getElementById('settings-alert');
+  el.className = 'alert alert-' + (type === 'success' ? 'success' : 'error');
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ''; el.className = ''; }, 3000);
+}
+
+// ═══════════════════════════════════════════════
+// STUDENT AUTH
+// ═══════════════════════════════════════════════
+
+function initStudentAuth() {
+  // Load registered students into state
+  try {
+    const saved = localStorage.getItem('ntscra_students');
+    if (saved) state.students = JSON.parse(saved);
+    else state.students = [];
+  } catch(e) { state.students = []; }
+
+  // Check if student is already logged in (sessionStorage)
+  const current = sessionStorage.getItem('ntscra_current_student');
+  if (current) {
+    try {
+      state.currentStudent = JSON.parse(current);
+      showStudentBadge();
+      // Portal is already visible (default)
+    } catch(e) { showStudentAuthGate(); }
+  } else {
+    showStudentAuthGate();
+  }
+}
+
+function showStudentAuthGate() {
+  document.getElementById('student-auth-page').style.display = 'flex';
+  document.getElementById('main-header').style.display = 'none';
+  const bar = document.getElementById('announce-bar');
+  if (bar) bar.style.display = 'none';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+}
+
+function hideStudentAuthGate() {
+  document.getElementById('student-auth-page').style.display = 'none';
+  document.getElementById('main-header').style.display = '';
+  const bar = document.getElementById('announce-bar');
+  if (bar) bar.style.display = '';
+  showPage('home');
+}
+
+function switchAuthTab(tab) {
+  document.getElementById('auth-login-panel').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('auth-enroll-panel').style.display = tab === 'enroll' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-enroll').classList.toggle('active', tab === 'enroll');
+  document.getElementById('login-student-error').style.display = 'none';
+  document.getElementById('enroll-error').style.display = 'none';
+  document.getElementById('enroll-success').style.display = 'none';
+}
+
+function generateMatric() {
+  const year = new Date().getFullYear();
+  const seq = String((state.students || []).length + 1).padStart(3, '0');
+  return `NTS/${year}/${seq}`;
+}
+
+function saveStudents() {
+  try { localStorage.setItem('ntscra_students', JSON.stringify(state.students || [])); } catch(e) {}
+}
+
+function doEnroll() {
+  const fn = document.getElementById('en-firstname').value.trim();
+  const ln = document.getElementById('en-lastname').value.trim();
+  const email = document.getElementById('en-email').value.trim().toLowerCase();
+  const phone = document.getElementById('en-phone').value.trim();
+  const gender = document.getElementById('en-gender').value;
+  const errEl = document.getElementById('enroll-error');
+  const sucEl = document.getElementById('enroll-success');
+  errEl.style.display = 'none';
+  sucEl.style.display = 'none';
+  if (!fn || !ln || !email || !phone || !gender) {
+    errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return;
+  }
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return;
+  }
+  if (!state.students) state.students = [];
+  if (state.students.find(s => s.email === email)) {
+    errEl.textContent = 'This email is already registered. Please login instead.'; errEl.style.display = 'block'; return;
+  }
+  const matric = generateMatric();
+  const student = { firstName: fn, lastName: ln, fullName: `${fn} ${ln}`, email, phone, gender, matric, enrolledAt: new Date().toISOString() };
+  state.students.push(student);
+  saveStudents();
+  sucEl.innerHTML = `
+    <strong>Enrollment Successful! 🎉</strong><br>
+    Welcome, <strong>${student.fullName}</strong>.<br>
+    Your Matric Number is: <strong style="font-size:1.1rem;letter-spacing:0.05em">${matric}</strong><br>
+    <small style="opacity:0.8">Please save your matric number. You will need it to login.</small>
+  `;
+  sucEl.style.display = 'block';
+  document.getElementById('en-firstname').value = '';
+  document.getElementById('en-lastname').value = '';
+  document.getElementById('en-email').value = '';
+  document.getElementById('en-phone').value = '';
+  document.getElementById('en-gender').value = '';
+  // Auto-login after 3 seconds
+  setTimeout(() => {
+    loginStudent(student);
+  }, 3000);
+}
+
+function doStudentLogin() {
+  const email = document.getElementById('sl-email').value.trim().toLowerCase();
+  const matric = document.getElementById('sl-matric').value.trim();
+  const errEl = document.getElementById('login-student-error');
+  errEl.style.display = 'none';
+  if (!email || !matric) {
+    errEl.textContent = 'Please enter your email and matric number.'; errEl.style.display = 'block'; return;
+  }
+  if (!state.students) state.students = [];
+  const student = state.students.find(s => s.email === email && s.matric.toLowerCase() === matric.toLowerCase());
+  if (!student) {
+    errEl.textContent = 'No account found with those credentials. Please check your email and matric number.'; errEl.style.display = 'block'; return;
+  }
+  loginStudent(student);
+}
+
+function loginStudent(student) {
+  state.currentStudent = student;
+  sessionStorage.setItem('ntscra_current_student', JSON.stringify(student));
+  showStudentBadge();
+  hideStudentAuthGate();
+}
+
+function showStudentBadge() {
+  if (!state.currentStudent) return;
+  const badge = document.getElementById('student-badge');
+  const name = document.getElementById('student-badge-name');
+  name.textContent = `👤 ${state.currentStudent.firstName} ${state.currentStudent.lastName} — ${state.currentStudent.matric}`;
+  badge.style.display = 'flex';
+}
+
+function studentLogout() {
+  state.currentStudent = null;
+  sessionStorage.removeItem('ntscra_current_student');
+  document.getElementById('student-badge').style.display = 'none';
+  // Clear form fields
+  ['sl-email','sl-matric'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  showStudentAuthGate();
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+loadState();
+initStudentAuth();
+</script>
+</body>
+</html>
